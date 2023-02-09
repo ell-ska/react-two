@@ -5,21 +5,21 @@ import util from 'util'
 import { format, formatDistanceToNow, parse, isToday, isBefore, isAfter } from 'date-fns'
 import { Command } from 'commander'
 
-// print name with chalk colors
+// name
 const name = 'ellska'
 
-// print git version
+// git version
 const asyncExec = util.promisify(exec)
 const {stdout: gitVersion} = await asyncExec('git --version')
 
-// print npm and node version
-    // this only works with 'npm run start' and not 'node index.js' because you need to use npm to see the version of it
+// npm and node version
+  // this only works with 'npm run start' and not 'node index.js' because you need to use npm to see the version of it
 const npmVersion = process.env.npm_config_user_agent
 
-// print current date
+// current date
 const currentDate = format(new Date(), 'yyyy-MM-dd kk:mm')
 
-// print days from course start to now
+// days from course start to now
 const startOfCourse = new Date(2023, 0, 31)
 const daysFromCourseStart = formatDistanceToNow(startOfCourse)
 
@@ -41,11 +41,63 @@ const dateComparison = (dateToCompare) => {
 }
 
 const dateArgument = parse(program.args[0], 'yyyy-MM-dd', new Date())
-const dateComparisonResult = dateComparison(dateArgument)
+let dateComparisonResult, mdContent, htmlContent
 
-// create a new file with the data above
-    // why is there an extra line between git and npm???
-const content = `name: ${name}
+// decide content based on if an argument was passed in or not
+if (program.args[0] === undefined || dateArgument == 'Invalid Date' ) {
+
+  mdContent = `name: ${name}
+git version: ${gitVersion.trim()}
+npm & node version: ${npmVersion}
+
+last run: ${currentDate}
+days from course start to now: ${daysFromCourseStart}
+you didn't pick a date. you can do that by running "npm run start --date '2002-01-01'"`
+
+  console.log(`${chalk.blue.bold(`Welcome!`)}
+${chalk.bgRed(`You didn't pick a date or the date you picked was invalid.`)}
+If you want to try again please do so by running "npm run start --date '2002-01-01'"
+
+Otherwise run ${chalk.blue(`open index.html`)} to see what you've created`)
+
+  htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Assignment 2 - Node, npm, Git, GitHub & DateTime</h1>
+    </header>
+    <main>
+        <div class="versions">
+            <p>Git version: ${gitVersion.trim()}</p>
+            <p>Npm & node version: ${npmVersion}</p>
+        </div>
+        <div class="date">
+            <p>Last run: ${currentDate}</p>
+            <p>Days from course start to now: ${daysFromCourseStart}</p>
+            <p class="warning">You didn't choose a date. You can do that by running "npm run start --date '2002-01-01'"</p>
+        </div>
+    </main>
+    <footer>
+        <p>Made by: ${name}</p>
+    </footer>
+</body>
+</html>`
+
+} else {
+
+  dateComparisonResult = dateComparison(dateArgument)
+
+  mdContent = `name: ${name}
 git version: ${gitVersion.trim()}
 npm & node version: ${npmVersion}
 
@@ -54,32 +106,45 @@ days from course start to now: ${daysFromCourseStart}
 your chosen date: ${format(dateArgument, 'yyyy-MM-dd')}
 the date is: ${dateComparisonResult}`
 
-await fs.promises.writeFile("index.md", content);
+htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Assignment 2 - Node, npm, Git, GitHub & DateTime</h1>
+    </header>
+    <main>
+        <div class="versions">
+            <p>Git version: ${gitVersion.trim()}</p>
+            <p>Npm & node version: ${npmVersion}</p>
+        </div>
+        <div class="date">
+            <p>Last run: ${currentDate}</p>
+            <p>Days from course start to now: ${daysFromCourseStart}</p>
+            <p>Your chosen date is: ${format(dateArgument, 'yyyy-MM-dd')}. That is ${dateComparisonResult}</p>
+        </div>
+    </main>
+    <footer>
+        <p>Made by: ${name}</p>
+    </footer>
+</body>
+</html>`
 
-console.log(`${chalk.blue.bold(`Welcome!`)}
+  console.log(`${chalk.blue.bold(`Welcome!`)}
 Your chosen date is: ${format(dateArgument, 'yyyy-MM-dd')}
-Your files are created`)
+Please run ${chalk.blue(`open index.html`)} to see what you've created`)
 
 
-// Recreate the code/steps of the presentation (Node and npm).
-//      Create an, index.js file that prints your name in the terminal.
-//      Init npm. Explain package.json, lock files and npm run.
-//      Install chalk (https://www.npmjs.com/package/chalk). Add some fancy coloring.
-//      Create a function that can print out your version of Git, npm och Node.
-//      Create a function that creates a index.md file with the above print outs.
-//      Add an argument parser.
-//      Do something with the argument parser.
-// Add a date library of your choice from npm
-//      Examples at https://2022.stateofjs.com/en-US/other-tools/#date_management
-//      Note that Moment.js is deprecated. Still good and often used, but the newer libraries are often a better choice.
-//      or use the temporal api polyfill, see video below
-// Add a function that writes current date and time to your file when you run your script.
-// Add a function that writes how long it was since you started this course.
-// Allow for sending in a date as an argument
-//      Write the argument-date to your file
-//      Add a function that figures out if date sent in as a argument is before or after the date when you run the file.
-// Make sure all the dates and times has a nice formatting that "everyone" can understand.
+}
 
-// Add a function that also creates a plain, runnable html-file (index.html) in addition to the index.md file. Include relevant markup and styling.
-// Create a public GitHub repo (if you haven't already, or a private repo but by also inviting me as a contributor) and "upload" your code. For your own convenience, make sure to setup you GitHub account with an ssh-key if you haven't already done so.
-// BONUS: Add a unit test for some part of the assignment (in addition to the example I showed during class).
+await fs.promises.writeFile("index.md", mdContent);
+await fs.promises.writeFile("index.html", htmlContent);
