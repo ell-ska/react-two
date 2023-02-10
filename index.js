@@ -77,11 +77,11 @@ Otherwise run ${chalk.blue(`open index.html`)} to see what you've created`)
         <h1>Assignment 2 - Node, npm, Git, GitHub & DateTime</h1>
     </header>
     <main>
-        <div class="versions">
+        <div>
             <p>Git version: ${gitVersion.trim()}</p>
             <p>Npm & node version: ${npmVersion}</p>
         </div>
-        <div class="date">
+        <div>
             <p>Last run: ${currentDate}</p>
             <p>Days from course start to now: ${daysFromCourseStart}</p>
             <p class="warning">You didn't choose a date. You can do that by running "npm run start --date '2002-01-01'"</p>
@@ -123,11 +123,11 @@ htmlContent = `<!DOCTYPE html>
         <h1>Assignment 2 - Node, npm, Git, GitHub & DateTime</h1>
     </header>
     <main>
-        <div class="versions">
+        <div>
             <p>Git version: ${gitVersion.trim()}</p>
             <p>Npm & node version: ${npmVersion}</p>
         </div>
-        <div class="date">
+        <div>
             <p>Last run: ${currentDate}</p>
             <p>Days from course start to now: ${daysFromCourseStart}</p>
             <p>Your chosen date is: ${format(dateArgument, 'yyyy-MM-dd')}. That is ${dateComparisonResult}</p>
